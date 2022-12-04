@@ -17,18 +17,15 @@ fun main() {
 
         return input.map { line -> findItemToRearrange(line) }
             .sumOf { item -> getItemPriority(item) }
-
     }
 
     fun part2(input: List<String>): Int {
-        var index = 0
-        var sumPriority = 0
-        while(index < input.size){
-             val badge = input[index].toSet().intersect(input[index+1].toSet()).intersect(input[index+2].toSet()).single()
-            sumPriority += getItemPriority(badge)
-            index += 3
-        }
-        return sumPriority
+        return input.chunked(3)
+            .map { elves -> elves.map {rucksack -> rucksack.toSet() }
+                .reduce{ acc, rucksack -> acc.intersect(rucksack) }
+                .single()
+            }
+            .sumOf { badge -> getItemPriority(badge) }
     }
 
 
