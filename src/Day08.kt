@@ -14,10 +14,10 @@ fun main() {
             for (y in rangeY) {
                 //detect if tree is on an edge
                 if (x == rangeX.first || y == rangeY.first
-                    || trees[x][y].height > maxHeight
+                    || trees[y][x].height > maxHeight
                 ) {
-                    trees[x][y].visible = true
-                    maxHeight = trees[x][y].height
+                    trees[y][x].visible = true
+                    maxHeight = trees[y][x].height
                 }
             }
         }
@@ -26,10 +26,10 @@ fun main() {
             for (x in rangeX) {
                 //detect if tree is on an edge
                 if (x == rangeX.first || y == rangeY.first
-                    || trees[x][y].height > maxHeight
+                    || trees[y][x].height > maxHeight
                 ) {
-                    trees[x][y].visible = true
-                    maxHeight = trees[x][y].height
+                    trees[y][x].visible = true
+                    maxHeight = trees[y][x].height
                 }
             }
         }
