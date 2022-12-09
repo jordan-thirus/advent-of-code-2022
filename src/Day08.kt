@@ -62,64 +62,57 @@ fun main() {
         //west
         for (x in trees[0].indices) {
             for (y in trees.indices) {
-                if(x == 0) {
-                    trees[y][x].viewWest = 0
-                }
-                else if(x == 1){
-                    trees[y][x].viewWest = 1
-                }
-                else {
-                    val heights = trees[y].subList(1, x).map { tree -> tree.height }.reversed()
-                    trees[y][x].viewWest = getViewInDirection(trees[y][x].height, heights)
+                when (x) {
+                    0 -> trees[y][x].viewWest = 0
+                    1 -> trees[y][x].viewWest = 1
+                    else -> {
+                        val heights = trees[y].subList(1, x).map { tree -> tree.height }.reversed()
+                        trees[y][x].viewWest = getViewInDirection(trees[y][x].height, heights)
+                    }
                 }
             }
         }
         //east
         for (x in trees[0].indices) {
             for (y in trees.indices) {
-                if (x == westEdge) {
-                    trees[y][x].viewEast = 0
-                }
-                else if(x == westEdge-1){
-                    trees[y][x].viewEast = 1
-                } else {
-                    val heights = trees[y].subList(x + 1, westEdge).map { tree -> tree.height }
-                    trees[y][x].viewEast =
-                        getViewInDirection(trees[y][x].height,  heights)
+                when (x) {
+                    westEdge -> trees[y][x].viewEast = 0
+                    westEdge-1 -> trees[y][x].viewEast = 1
+                    else -> {
+                        val heights = trees[y].subList(x + 1, westEdge).map { tree -> tree.height }
+                        trees[y][x].viewEast =
+                            getViewInDirection(trees[y][x].height,  heights)
+                    }
                 }
             }
         }
         //north
         for (x in trees[0].indices) {
             for (y in trees.indices) {
-                if(y == 0){
-                    trees[y][x].viewNorth = 0
-                }
-                else if(y == 1){
-                    trees[y][x].viewNorth = 1
-                }
-                else {
-                    val heights = trees.subList(1, y).map { row -> row[x] }.map { tree -> tree.height }.reversed()
-                    trees[y][x].viewNorth = getViewInDirection(trees[y][x].height, heights)
+                when (y) {
+                    0 -> trees[y][x].viewNorth = 0
+                    1 -> trees[y][x].viewNorth = 1
+                    else -> {
+                        val heights = trees.subList(1, y).map { row -> row[x] }.map { tree -> tree.height }.reversed()
+                        trees[y][x].viewNorth = getViewInDirection(trees[y][x].height, heights)
+                    }
                 }
             }
         }
         //south
         for (x in trees[0].indices) {
             for (y in trees.indices) {
-                if (y == southEdge) {
-                    trees[y][x].viewSouth = 0
-                }
-                else if(y == southEdge-1){
-                    trees[y][x].viewSouth = 1
-                } else {
-                    val heights = trees.subList(y + 1, southEdge).map { row -> row[x] }.map { tree -> tree.height }
-                    trees[y][x].viewSouth =
-                        getViewInDirection(trees[y][x].height, heights)
+                when (y) {
+                    southEdge -> trees[y][x].viewSouth = 0
+                    southEdge-1 -> trees[y][x].viewSouth = 1
+                    else -> {
+                        val heights = trees.subList(y + 1, southEdge).map { row -> row[x] }.map { tree -> tree.height }
+                        trees[y][x].viewSouth =
+                            getViewInDirection(trees[y][x].height, heights)
+                    }
                 }
             }
         }
-
 
 //        trees.forEach { row ->
 //            row.forEach { tree -> print("${tree.scenicScore}\t") }
