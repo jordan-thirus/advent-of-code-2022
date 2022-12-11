@@ -1,53 +1,48 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        val monkies = input.chunked(7).map { Monkey.build(it) }
-        repeat(20) {
-            for (monkey in monkies) {
-                while (monkey.que.any()) {
-                    var item = monkey.getItem()
-                    val newWorryLevel = monkey.updateWorryLevel(item) / 3
+    fun processRound(monkeys: List<Monkey>, reduceWorryLevel: (Long) -> Long) {
+        for (monkey in monkeys) {
+            while (monkey.items.any()) {
+                monkey.throughput += monkey.items.size
+                for(item in monkey.items) {
+                    val newWorryLevel = reduceWorryLevel(monkey.updateWorryLevel(item))
                     if (newWorryLevel % monkey.testValue == 0L) {
-                        monkies[monkey.monkeyIfTrue].catchItem(newWorryLevel)
+                        monkeys[monkey.monkeyIfTrue].items.add(newWorryLevel)
                     } else {
-                        monkies[monkey.monkeyIfFalse].catchItem(newWorryLevel)
+                        monkeys[monkey.monkeyIfFalse].items.add(newWorryLevel)
                     }
                 }
+                monkey.items.clear()
             }
         }
+    }
 
-        return monkies
+    fun part1(input: List<String>): Int {
+        val monkeys = input.chunked(7).map { Monkey.build(it) }
+        repeat(20) {
+            processRound(monkeys) { it / 3 }
+        }
+
+        return monkeys
             .map { it.throughput }
             .sortedDescending()
-            .take(2)
-            .reduce { acc, i -> acc * i }
+            .let { it[0] * it[1] }
     }
 
     fun part2(input: List<String>): Long {
-        val monkies = input.chunked(7).map { Monkey.build(it) }
-        val reduceWorryLevel: Long = monkies.map { m -> m.testValue.toLong() }.reduce(Long::times)
+        val monkeys = input.chunked(7).map { Monkey.build(it) }
+        val reduceWorryLevel: Long = monkeys.map { m -> m.testValue.toLong() }.reduce(Long::times)
 
         repeat(10000) {
-            for (monkey in monkies) {
-                while (monkey.que.any()) {
-                    var item = monkey.getItem()
-                    val newWorryLevel = monkey.updateWorryLevel(item) % reduceWorryLevel
-                    if ((newWorryLevel % monkey.testValue.toLong()) == 0L) {
-                        monkies[monkey.monkeyIfTrue].catchItem(newWorryLevel)
-                    } else {
-                        monkies[monkey.monkeyIfFalse].catchItem(newWorryLevel)
-                    }
-                }
-            }
-/*            if (it+1 in setOf(1, 20, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000)) {
-                println("Round ${it+1}: $monkies")
-            }*/
+            processRound(monkeys) { item -> item % reduceWorryLevel }
+//            if (it + 1 in setOf(1, 20, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000)) {
+//                println("Round ${it + 1}: $monkeys")
+//            }
         }
 
-        return monkies
+        return monkeys
             .map { it.throughput.toLong() }
             .sortedDescending()
-            .take(2)
-            .reduce { acc, i -> acc * i }
+            .let { it[0] * it[1] }
     }
 
     // test if implementation meets criteria from the description, like:
@@ -66,28 +61,18 @@ class Monkey(
 ) {
     var throughput: Int = 0
 
-    val que: ArrayDeque<Long>
+    val items: MutableList<Long>
     private val modifyOperation: Operation
     private val modifyValue: String
 
     init {
-        que = ArrayDeque(startingItems)
+        items = startingItems.toMutableList()
         modifyOperation = Operation.get(operation[0])
         modifyValue = operation[1]
     }
 
     override fun toString(): String {
         return "Throughput $throughput"
-    }
-
-    fun catchItem(worryLevel: Long) {
-        que.addLast(worryLevel)
-    }
-
-    fun getItem(): Long {
-        throughput++
-        return que.removeFirst()
-
     }
 
     fun updateWorryLevel(item: Long): Long {
@@ -102,13 +87,12 @@ class Monkey(
 
     companion object {
         fun build(input: List<String>): Monkey {
-
-            val startingItems = input[1].removePrefix("  Starting items: ").split(", ").map { it -> it.toLong() }
+            val startingItems = input[1].removePrefix("  Starting items: ").split(", ").map { it.toLong() }
             val operation = input[2].split(" ").takeLast(2)
             val testValue = input[3].split(" ").last().toInt()
             val ifTrue = input[4].split(" ").last().toInt()
             val ifFalse = input[5].split(" ").last().toInt()
-           return Monkey(testValue, ifTrue, ifFalse, startingItems, operation)
+            return Monkey(testValue, ifTrue, ifFalse, startingItems, operation)
         }
     }
 }
