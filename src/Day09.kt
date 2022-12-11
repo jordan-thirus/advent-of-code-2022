@@ -1,86 +1,49 @@
-import kotlin.math.abs
+import kotlin.math.sign
 
 fun main() {
-    fun part1(input: List<String>): Int {
-        val head = Point(0,0)
-        var tail = Point(0,0)
+    fun moveToNewPosition(prev: Point, point: Point): Point {
+        return if (!prev.isAdjacent(point)) {
+            val x = (prev.x - point.x).sign + point.x
+            val y = (prev.y - point.y).sign + point.y
+            Point(x, y)
+        } else {
+            point
+        }
+    }
 
+    fun part1(input: List<String>): Int {
+        val head = Point(0, 0)
+        var tail = Point(0, 0)
         val visited = mutableSetOf(tail)
 
-        fun changePosition(distance: Int, move: (Point) -> Unit){
-            repeat(distance){
-                val lastPosition = head.copy()
-                move(head)
-                if(!head.isAdjacent(tail)){
-                    if(head.isNotInSameRowOrColumn(tail)){
-                        //move diagonally to the position of the last segment
-                        tail = lastPosition.copy()
-
-                    }else {
-                        move(tail)
-                    }
-                    visited.add(tail)
-                }
-            }
-        }
-
-        for(line in input){
+        for (line in input) {
             val move = line.split(" ")
-            when(move[0]){
-                "L" -> changePosition(move[1].toInt()) { it.x-- }
-                "R" -> changePosition(move[1].toInt()) { it.x++ }
-                "U" -> changePosition(move[1].toInt()) { it.y++ }
-                "D" -> changePosition(move[1].toInt()) { it.y-- }
-                else -> throw IllegalArgumentException("Bad move")
+            val distance = move[1].toInt()
+            val direction = move[0]
+
+            repeat(distance) {
+                head.move(direction)
+                tail = moveToNewPosition(head, tail)
+                visited.add(tail)
             }
-            //println("head: $head, tail: $tail")
         }
         return visited.size
     }
 
     fun part2(input: List<String>): Int {
-        var snake = listOf(Point(0,0),Point(0,0),Point(0,0),Point(0,0),Point(0,0),Point(0,0),Point(0,0),Point(0,0),Point(0,0),Point(0,0))
+        var snake = Array(10) { Point(0,0)}.toList()
         val visited = mutableSetOf(snake.last())
 
-        fun changePosition(distance: Int, move: (Point) -> Unit){
-            repeat(distance){
-                //println("Moved head from $lastPosition to ${snake.first()}")
-                move(snake.first())
-                snake = snake.runningReduce { acc, point ->
-                    var newPosition = point.copy()
-                    if (!acc.isAdjacent(point)) {
-                            if(point.x > acc.x){
-                                newPosition.x--
-                            } else if (point.x < acc.x) {
-                                newPosition.x++
-                            }
-                            if(point.y > acc.y){
-                                newPosition.y--
-                            } else if (point.y < acc.y){
-                                newPosition.y++
-                            }
-                            if(!acc.isAdjacent(newPosition)){
-                                println("Point $acc and point $newPosition are not adjacent and should be")
-                            }
-                        }
 
-                    newPosition
-                }
-                //println(snake)
-                visited.add(snake.last())
-            }
-            println(visited.size)
-        }
-
-        for(line in input){
-            println(line)
+        for (line in input) {
             val move = line.split(" ")
-            when(move[0]){
-                "L" -> changePosition(move[1].toInt()) { it.x-- }
-                "R" -> changePosition(move[1].toInt()) { it.x++ }
-                "U" -> changePosition(move[1].toInt()) { it.y++ }
-                "D" -> changePosition(move[1].toInt()) { it.y-- }
-                else -> throw IllegalArgumentException("Bad move")
+            val distance = move[1].toInt()
+            val direction = move[0]
+
+            repeat(distance) {
+                snake.first().move(direction)
+                snake = snake.runningReduce { acc, point -> moveToNewPosition(acc, point) }
+                visited.add(snake.last())
             }
         }
         return visited.size
@@ -95,11 +58,17 @@ fun main() {
     println(part2(input))
 }
 
-data class Point(var x: Int, var y: Int){
-    fun isAdjacent(other: Point): Boolean {
-        val adj = x - other.x in -1..1 && y - other.y in -1..1
-        return adj
+data class Point(var x: Int, var y: Int) {
+    fun isAdjacent(other: Point): Boolean =
+        x - other.x in -1..1 && y - other.y in -1..1
+
+    fun move(direction: String) {
+        when (direction) {
+            "L" -> x--
+            "R" -> x++
+            "U" -> y++
+            "D" -> y--
+            else -> throw IllegalArgumentException("Bad move")
+        }
     }
-    fun isNotInSameRowOrColumn(other: Point): Boolean =
-        x != other.x && y != other.y
 }
