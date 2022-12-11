@@ -49,7 +49,6 @@ fun main() {
                 snake = snake.runningReduce { acc, point ->
                     var newPosition = point.copy()
                     if (!acc.isAdjacent(point)) {
-                        if(acc.isNotInSameRowOrColumn(point)){
                             if(point.x > acc.x){
                                 newPosition.x--
                             } else if (point.x < acc.x) {
@@ -63,13 +62,11 @@ fun main() {
                             if(!acc.isAdjacent(newPosition)){
                                 println("Point $acc and point $newPosition are not adjacent and should be")
                             }
-                        } else {
-                            move(newPosition)
                         }
-                    }
+
                     newPosition
                 }
-                println(snake)
+                //println(snake)
                 visited.add(snake.last())
             }
             println(visited.size)
@@ -95,7 +92,7 @@ fun main() {
 
     val input = readInput("Day09")
     println(part1(input))
-    //println(part2(input))
+    println(part2(input))
 }
 
 data class Point(var x: Int, var y: Int){
