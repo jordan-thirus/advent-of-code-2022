@@ -82,6 +82,7 @@ class Monkey(
                 "old" -> item * item
                 else -> item * modifyValue.toInt()
             }
+            else -> throw UnsupportedOperationException("Invalid operation")
         }
     }
 
@@ -97,14 +98,3 @@ class Monkey(
     }
 }
 
-enum class Operation {
-    ADD, MULTIPLY;
-
-    companion object {
-        fun get(op: String) = when (op) {
-            "+" -> ADD
-            "*" -> MULTIPLY
-            else -> throw UnsupportedOperationException("Invalid operation")
-        }
-    }
-}

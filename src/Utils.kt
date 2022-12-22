@@ -28,3 +28,17 @@ data class Point(val y: Int, val x: Int){
     fun neighbors() = setOf(left(), right(), up(), down())
     fun isInBounds(yRange: IntRange, xRange: IntRange) = y in yRange && x in xRange
 }
+
+enum class Operation {
+    ADD, MULTIPLY, SUBTRACT, DIVIDE, RETURN;
+    companion object {
+        fun get(op: String) = when (op) {
+            "+" -> ADD
+            "*" -> MULTIPLY
+            "-" -> SUBTRACT
+            "/" -> DIVIDE
+            "" -> RETURN
+            else -> throw UnsupportedOperationException("Invalid operation")
+        }
+    }
+}
